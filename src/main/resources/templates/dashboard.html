@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MDM Dashboard</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <h1 th:text="${principalName}"></h1>
+    <a th:href="@{/logout}">Logout</a>
+    <a th:unless="${applicationUserHasEnterprise}" th:href="@{/enterprises/new}">Create Enterprise</a>
+    <a th:if="${applicationUserHasEnterprise}" th:href="@{/enterprises/{enterpriseId}(enterpriseId=${applicationUsersEnterprise.getId()})}">My Enterprise</a>
+</body>
+</html>

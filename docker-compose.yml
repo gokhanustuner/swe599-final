@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  mdmapp:
+    build: .
+    container_name: mdmapp
+    # command: ./mvnw spring-boot:run
+    volumes:
+      - .:/usr/src/swe599-final
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mdmdb
+  mdmdb:
+    container_name: mdmdb
+    build: ./etc/docker/mariadb
+    volumes:
+      - ./etc/docker/mariadb/config:/etc/mysql/conf.d
+    env_file:
+      - ./etc/docker/mariadb/env/common.env
+    restart: always
+    ports:
+      - "28004:3306"
+
