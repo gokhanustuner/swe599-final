@@ -21,7 +21,7 @@ import java.io.IOException;
 public class EnterpriseController {
 
     @Autowired
-    EnterpriseService enterpriseService;
+    private EnterpriseService enterpriseService;
 
     @GetMapping("/enterprises/new")
     public String getNewEnterprisePage(Model model) {

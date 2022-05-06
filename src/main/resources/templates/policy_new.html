@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div class="container text-center">
+    <div>
+        <h1>New Policy</h1>
+    </div>
+    <form th:action="@{/policies/create}" th:object="${policy}"
+          method="post" style="max-width: 960px; margin: 0 auto;">
+        <div class="m-3">
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Display Name: </label>
+                <div class="col-9">
+                    <input th:field="*{displayName}" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Applications: </label>
+                <div class="col-9" th:each="applicationPolicy, itemStat : *{applications}">
+                    <div class="col-4 d-inline-block">
+                        <input class="form-control" th:field="*{applications[__${itemStat.index}__].packageName}" />
+                    </div>
+                    <div class="col-4 d-inline-block">
+                        <input class="form-control" th:field="*{applications[__${itemStat.index}__].installType}" />
+                    </div>
+                    <div class="col-4 d-inline-block">
+                        <input class="form-control" th:field="*{applications[__${itemStat.index}__].defaultPermissionPolicy}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-3 col-form-label" for="flexCheckDefault">
+                    Default:
+                </label>
+                <div class="col-9">
+                    <input th:field="*{initial}" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -2,10 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Enterprise creation failed</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
-    <p>Enterprise successfully created</p>
-    <p th:text="${enterpriseName}"></p>
+    <span class="alert alert-danger">Enterprise creation failed</span>
+    <p th:text="${error}"></p>
+    <a th:href="@{/enterprises/new}">Try again</a>
 </body>
 </html>

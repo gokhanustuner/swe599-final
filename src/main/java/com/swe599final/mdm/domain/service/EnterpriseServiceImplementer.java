@@ -3,7 +3,6 @@ package com.swe599final.mdm.domain.service;
 import com.google.api.services.androidmanagement.v1.model.ContactInfo;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
-import com.swe599final.mdm.domain.repository.UserRepository;
 import com.swe599final.mdm.infrastructure.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,23 +16,22 @@ import java.util.Optional;
 @Service
 public class EnterpriseServiceImplementer implements EnterpriseService {
     @Autowired
-    AndroidManager androidManager;
+    private AndroidManager androidManager;
 
     @Autowired
-    EnterpriseRepository enterpriseRepository;
+    private EnterpriseRepository enterpriseRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private MdmUserDetailsService userDetailsService;
 
     @Override
-    public EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException {
+    public EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, UsernameNotFoundException {
         com.google.api.services.androidmanagement.v1.model.Enterprise androidEnterprise =
                 androidManager.createEnterprise(enterpriseDto.getDisplayName(), enterpriseDto.getEmail());
 
-        UserDetails userDetails = (MdmUserDetails) principal.getPrincipal();
-        Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
-        user.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername()));
-        MdmUserDetails mappedUser = user.map(MdmUserDetails::new).get();
+
+        UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
+        MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 
         Enterprise mdmEnterprise = new Enterprise();
         mdmEnterprise.setName(androidEnterprise.getName());
@@ -52,10 +50,9 @@ public class EnterpriseServiceImplementer implements EnterpriseService {
 
     @Override
     public EnterpriseResponse get(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
-        UserDetails userDetails = (MdmUserDetails) principal.getPrincipal();
-        Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
-        user.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername()));
-        MdmUserDetails mappedUser = user.map(MdmUserDetails::new).get();
+        UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
+        MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
+
         Optional<Enterprise> enterprise = enterpriseRepository.findByIdAndUserId(enterpriseId, mappedUser.getId());
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();

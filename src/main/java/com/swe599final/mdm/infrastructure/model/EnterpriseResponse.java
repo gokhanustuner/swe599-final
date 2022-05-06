@@ -1,6 +1,6 @@
 package com.swe599final.mdm.infrastructure.model;
 
-public class EnterpriseResponse {
+public final class EnterpriseResponse {
     private Long id;
 
     private String name;

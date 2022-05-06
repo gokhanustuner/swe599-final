@@ -12,5 +12,7 @@
     <a th:href="@{/logout}">Logout</a>
     <a th:unless="${applicationUserHasEnterprise}" th:href="@{/enterprises/new}">Create Enterprise</a>
     <a th:if="${applicationUserHasEnterprise}" th:href="@{/enterprises/{enterpriseId}(enterpriseId=${applicationUsersEnterprise.getId()})}">My Enterprise</a>
+    <a th:if="${applicationUserHasEnterprise}" th:href="@{/policies/new}">New Policy</a>
+    <a th:if="${applicationUserHasEnterprise}" th:href="@{/policies/list}">List Policies</a>
 </body>
 </html>

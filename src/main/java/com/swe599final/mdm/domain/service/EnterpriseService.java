@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public interface EnterpriseService {
-    abstract public EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, GeneralSecurityException;
-    abstract public EnterpriseResponse get(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
-    abstract public Enterprise update(EnterpriseId enterpriseId, String displayName, ContactInfo contactInfo);
-    abstract public void delete(EnterpriseId enterpriseId);
+    public EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, GeneralSecurityException;
+    public EnterpriseResponse get(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    public Enterprise update(EnterpriseId enterpriseId, String displayName, ContactInfo contactInfo);
+    public void delete(EnterpriseId enterpriseId);
 }

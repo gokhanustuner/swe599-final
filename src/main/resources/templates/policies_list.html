@@ -2,15 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${enterprise.getDisplayName()}"></title>
+    <title>Policies - MDM</title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
-    <span th:if="${success}" class="alert-success">Enterprise has successfully been created!</span>
-    <p th:text="${enterprise.getDisplayName()}"></p>
-    <p th:text="${enterprise.id}"></p>
-    <a th:href="@{/dashboard}">Dashboard</a>
+
 </body>
 </html>

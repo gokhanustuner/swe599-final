@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${policy.getDisplayName()}"></title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <span th:if="${success}" class="alert-success">Policy has successfully been created!</span>
+    <p th:text="${policy.getDisplayName()}"></p>
+    <p th:text="${policy.getName()}"></p>
+    <p th:text="${policy.getId()}"></p>
+    <p th:if="${policy.getApplications().isEmpty()}">No Application are Available</p>
+    <p th:each="applicationPolicy : ${policy.getApplications()}">
+        <span th:text="${applicationPolicy.getPackageName()}"> Package Name </span>
+        <span th:text="${applicationPolicy.getInstallType()}"> Install Type </span>
+        <span th:text="${applicationPolicy.getDefaultPermissionPolicy()}"> Default Permission Policy </span>
+    </p>
+    <a th:href="@{/dashboard}">Dashboard</a>
+    <a th:href="@{/policies/list}">Policies List</a>
+</body>
+</html>

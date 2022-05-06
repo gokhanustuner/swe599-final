@@ -10,6 +10,9 @@ public class Policy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
+    private String displayName;
+
     @Column(nullable = false, unique = true)
     private String name;
 
@@ -25,6 +28,14 @@ public class Policy {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getName() {

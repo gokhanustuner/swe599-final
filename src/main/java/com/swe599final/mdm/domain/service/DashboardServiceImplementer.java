@@ -2,7 +2,7 @@ package com.swe599final.mdm.domain.service;
 
 import com.swe599final.mdm.domain.repository.UserRepository;
 import com.swe599final.mdm.infrastructure.model.Enterprise;
-import com.swe599final.mdm.infrastructure.model.MdmUserDetails;
+import com.swe599final.mdm.infrastructure.model.MdmUserDetailsImplementer;
 import com.swe599final.mdm.infrastructure.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +21,7 @@ public class DashboardServiceImplementer implements DashboardService {
     public Enterprise getApplicationUsersEnterprise(UserDetails userDetails) {
         Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
         user.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername()));
-        MdmUserDetails mappedUser = user.map(MdmUserDetails::new).get();
+        MdmUserDetailsImplementer mappedUser = user.map(MdmUserDetailsImplementer::new).get();
 
         return mappedUser.getUser().getEnterprise();
     }

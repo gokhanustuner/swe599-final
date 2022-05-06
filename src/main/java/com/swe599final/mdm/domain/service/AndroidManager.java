@@ -6,12 +6,14 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.androidmanagement.v1.AndroidManagement;
 import com.google.api.services.androidmanagement.v1.model.ContactInfo;
 import com.google.api.services.androidmanagement.v1.model.Enterprise;
+import com.google.api.services.androidmanagement.v1.model.Policy;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 public class AndroidManager {
@@ -54,6 +56,16 @@ public class AndroidManager {
 
     public Enterprise getEnterprise(String name) throws IOException {
         return androidManagementClient.enterprises().get(name).execute();
+    }
+
+    public Policy createPolicy(String name, Policy policy) throws IOException {
+        String policyName = name + "/policies/" + UUID.randomUUID();
+
+        return androidManagementClient.enterprises().policies().patch(policyName, policy).execute();
+    }
+
+    public Policy getPolicy(String name) throws IOException {
+        return androidManagementClient.enterprises().policies().get(name).execute();
     }
 
     private static AndroidManagement getAndroidManagementClient() throws IOException, GeneralSecurityException {
