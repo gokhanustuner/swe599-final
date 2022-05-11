@@ -27,6 +27,8 @@ final public class EnrollmentTokenResponse {
 
     private EnrollmentTokenStatus status;
 
+    private String qrCodeFilePath;
+
     public Long getId() {
         return id;
     }
@@ -129,5 +131,13 @@ final public class EnrollmentTokenResponse {
 
     public void setStatus(EnrollmentTokenStatus status) {
         this.status = status;
+    }
+
+    public String getQrCodeFilePath() {
+        return qrCodeFilePath;
+    }
+
+    public void setQrCodeFilePath(String qrCodeFilePath) {
+        this.qrCodeFilePath = qrCodeFilePath;
     }
 }

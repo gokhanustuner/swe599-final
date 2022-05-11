@@ -50,6 +50,9 @@ final public class EnrollmentToken {
     @ManyToOne
     private DeviceUser deviceUser;
 
+    @Column(nullable = false)
+    private String qrCodeFilePath;
+
     public long getId() {
         return id;
     }
@@ -160,5 +163,13 @@ final public class EnrollmentToken {
 
     public void setDeviceUser(DeviceUser deviceUser) {
         this.deviceUser = deviceUser;
+    }
+
+    public String getQrCodeFilePath() {
+        return qrCodeFilePath;
+    }
+
+    public void setQrCodeFilePath(String qrCodeFilePath) {
+        this.qrCodeFilePath = qrCodeFilePath;
     }
 }

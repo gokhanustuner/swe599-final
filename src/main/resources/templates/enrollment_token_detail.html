@@ -24,6 +24,7 @@
 <p th:text="${enrollmentToken.getQrCode()}"></p>
 <p th:text="${enrollmentToken.getStatus()}"></p>
 <p th:text="${enrollmentToken.getValue()}"></p>
+<img th:src="@{${enrollmentToken.getQrCodeFilePath()}}" width="250" height="250">
 
 <a th:href="@{/dashboard}">Dashboard</a>
 <a th:href="@{/enrollment-tokens/list}">Enrollment Tokens List</a>

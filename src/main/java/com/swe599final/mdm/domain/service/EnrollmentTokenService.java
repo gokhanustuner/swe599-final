@@ -1,5 +1,6 @@
 package com.swe599final.mdm.domain.service;
 
+import com.google.zxing.WriterException;
 import com.swe599final.mdm.domain.exception.DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException;
 import com.swe599final.mdm.domain.exception.EnrollmentTokenNotFoundByIdAndEnterpriseIdException;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public interface EnrollmentTokenService {
     EnrollmentTokenResponse create(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException,
-                    DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException;
+                    DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException, WriterException;
     EnrollmentTokenResponse delete(Long enrollmentTokenId) throws IOException;
     EnrollmentTokenResponse get(Long enrollmentTokenId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException;

@@ -1,5 +1,6 @@
 package com.swe599final.mdm.domain.service;
 
+import com.google.zxing.WriterException;
 import com.swe599final.mdm.domain.exception.DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException;
 import com.swe599final.mdm.domain.exception.EnrollmentTokenNotFoundByIdAndEnterpriseIdException;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
@@ -39,7 +40,7 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
 
     @Override
     public EnrollmentTokenResponse create(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
-            throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException,
+            throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException, WriterException,
                     DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
@@ -48,17 +49,14 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();
 
-        System.out.println("policy id: " + enrollmentTokenDto.getPolicyId() + ", enterprise id: " + mdmEnterprise.getId());
         Optional<Policy> policy = policyRepository.findByIdAndEnterpriseId(enrollmentTokenDto.getPolicyId(), mdmEnterprise.getId());
         policy.orElseThrow(() -> new PolicyNotFoundByIdAndEnterpriseIdException(
                 "Enterprise not found with policy id " + enrollmentTokenDto.getPolicyId() + " and enterprise id: " + mdmEnterprise.getId()
             )
         );
         Policy mdmPolicy = policy.get();
-        System.out.println("MDM Policy Id: " + mdmPolicy.getId());
         com.google.api.services.androidmanagement.v1.model.EnrollmentToken androidEnrollmentToken =
                 androidManager.createEnrollmentToken(mdmPolicy.getName(), mdmEnterprise.getName(), enrollmentTokenDto.getDeviceUser());
-        System.out.println("Coming here!!" + androidEnrollmentToken.getUser().getAccountIdentifier());
 
         Optional<DeviceUser> deviceUser = deviceUserRepository.findByEnterpriseIdAndAccountIdentifier(mdmEnterprise.getId(), enrollmentTokenDto.getDeviceUser());
         DeviceUser mdmDeviceUser = new DeviceUser();
@@ -71,10 +69,9 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
             mdmDeviceUser = deviceUser.get();
         }
 
-
-        System.out.println("Device User Id: " + mdmDeviceUser.getId());
-
         try {
+            String qrCodeFilePath = QRCodeService.generateQRCodeImage(androidEnrollmentToken.getQrCode(), 250, 250);
+
             EnrollmentToken mdmEnrollmentToken = new EnrollmentToken();
             mdmEnrollmentToken.setPolicyName(androidEnrollmentToken.getPolicyName());
             mdmEnrollmentToken.setToken(androidEnrollmentToken.getValue());
@@ -90,9 +87,8 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
             mdmEnrollmentToken.setStatus(EnrollmentTokenStatus.QUEUE);
             mdmEnrollmentToken.setDeviceUser(mdmDeviceUser);
             mdmEnrollmentToken.setQrCode(androidEnrollmentToken.getQrCode());
-            System.out.println("Before enrollment token creation!!!");
+            mdmEnrollmentToken.setQrCodeFilePath(qrCodeFilePath);
             mdmEnrollmentToken = enrollmentTokenRepository.save(mdmEnrollmentToken);
-            System.out.println("After enrollment token creation!!!");
 
             EnrollmentTokenResponse enrollmentTokenResponse = new EnrollmentTokenResponse();
             enrollmentTokenResponse.setId(mdmEnrollmentToken.getId());
@@ -108,6 +104,7 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
             enrollmentTokenResponse.setQrCode(androidEnrollmentToken.getQrCode());
             enrollmentTokenResponse.setDeviceUser(mdmDeviceUser);
             enrollmentTokenResponse.setStatus(EnrollmentTokenStatus.QUEUE);
+            enrollmentTokenResponse.setQrCodeFilePath(qrCodeFilePath);
 
             return enrollmentTokenResponse;
         } catch (Exception e) {
@@ -151,6 +148,7 @@ final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
         enrollmentTokenResponse.setAdditionalData(mdmEnrollmentToken.getAdditionalData());
         enrollmentTokenResponse.setDuration(mdmEnrollmentToken.getDuration());
         enrollmentTokenResponse.setAllowPersonalUsage(mdmEnrollmentToken.getAllowPersonalUsage());
+        enrollmentTokenResponse.setQrCodeFilePath(mdmEnrollmentToken.getQrCodeFilePath());
 
         return enrollmentTokenResponse;
     }
