@@ -4,9 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.androidmanagement.v1.AndroidManagement;
-import com.google.api.services.androidmanagement.v1.model.ContactInfo;
-import com.google.api.services.androidmanagement.v1.model.Enterprise;
-import com.google.api.services.androidmanagement.v1.model.Policy;
+import com.google.api.services.androidmanagement.v1.model.*;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -16,7 +14,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Service
-public class AndroidManager {
+final public class AndroidManager {
     /** The JSON credential file for the service account. */
     private static final String SERVICE_ACCOUNT_CREDENTIAL_FILE = "/Users/gokhanustuner/Downloads/swe578-c6b0b00ff06c.json";
 
@@ -66,6 +64,18 @@ public class AndroidManager {
 
     public Policy getPolicy(String name) throws IOException {
         return androidManagementClient.enterprises().policies().get(name).execute();
+    }
+
+    public EnrollmentToken createEnrollmentToken(String policyId, String enterpriseName, String accountIdentifier) throws IOException {
+        EnrollmentToken token =
+            new EnrollmentToken()
+                .setAllowPersonalUsage("PERSONAL_USAGE_ALLOWED")
+                .setOneTimeOnly(true)
+                .setUser(new User().setAccountIdentifier(accountIdentifier))
+                .setPolicyName(policyId)
+                .setDuration("60s");
+
+        return androidManagementClient.enterprises().enrollmentTokens().create(enterpriseName, token).execute();
     }
 
     private static AndroidManagement getAndroidManagementClient() throws IOException, GeneralSecurityException {

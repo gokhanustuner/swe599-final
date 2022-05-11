@@ -5,5 +5,5 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface MdmUserDetailsService extends UserDetailsService {
-    public MdmUserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
+    MdmUserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
 }

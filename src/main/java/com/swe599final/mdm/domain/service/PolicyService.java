@@ -9,9 +9,9 @@ import org.springframework.security.core.Authentication;
 import java.io.IOException;
 
 public interface PolicyService {
-    public PolicyResponse create(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
-    public PolicyResponse get(Long policyId, Authentication principal)
+    PolicyResponse create(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    PolicyResponse get(Long policyId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException;
-    public PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal);
-    public void delete(Long policyId);
+    PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal);
+    void delete(Long policyId);
 }

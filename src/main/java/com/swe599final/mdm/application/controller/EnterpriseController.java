@@ -18,7 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.io.IOException;
 
 @Controller
-public class EnterpriseController {
+final public class EnterpriseController {
 
     @Autowired
     private EnterpriseService enterpriseService;

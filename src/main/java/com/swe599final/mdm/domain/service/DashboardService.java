@@ -4,5 +4,5 @@ import com.swe599final.mdm.infrastructure.model.Enterprise;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface DashboardService {
-    abstract public Enterprise getApplicationUsersEnterprise(UserDetails userDetails);
+    Enterprise getApplicationUsersEnterprise(UserDetails userDetails);
 }

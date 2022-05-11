@@ -1,17 +1,21 @@
 package com.swe599final.mdm.infrastructure.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "device_users")
-public class DeviceUser {
+final public class DeviceUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
-    private String email;
+    private String accountIdentifier;
+
+    @OneToMany
+    private List<EnrollmentToken> enrollmentTokens;
 
     @ManyToOne
     private Enterprise enterprise;
@@ -24,12 +28,20 @@ public class DeviceUser {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getAccountIdentifier() {
+        return accountIdentifier;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAccountIdentifier(String accountIdentifier) {
+        this.accountIdentifier = accountIdentifier;
+    }
+
+    public List<EnrollmentToken> getEnrollmentTokens() {
+        return enrollmentTokens;
+    }
+
+    public void setEnrollmentTokens(List<EnrollmentToken> enrollmentTokens) {
+        this.enrollmentTokens = enrollmentTokens;
     }
 
     public Enterprise getEnterprise() {

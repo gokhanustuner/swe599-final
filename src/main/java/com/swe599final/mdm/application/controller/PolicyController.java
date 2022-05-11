@@ -20,7 +20,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.io.IOException;
 
 @Controller
-public class PolicyController {
+final public class PolicyController {
 
     @Autowired
     private PolicyService policyService;

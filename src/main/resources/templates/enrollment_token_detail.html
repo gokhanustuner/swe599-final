@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${enrollmentToken.getName()}"></title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<span th:if="${success}" class="alert-success">Enrollment Token has successfully been created!</span>
+<p th:text="${enrollmentToken.getName()}"></p>
+<p th:text="${enrollmentToken.getName()}"></p>
+<p th:text="${enrollmentToken.getDeviceUser().getAccountIdentifier()}"></p>
+<p th:text="${enrollmentToken.getAdditionalData()}"></p>
+<p th:text="${enrollmentToken.getAllowPersonalUsage()}"></p>
+<p th:text="${enrollmentToken.getDuration()}"></p>
+<p th:text="${enrollmentToken.getExpirationTimestamp()}"></p>
+<p th:text="${enrollmentToken.getOneTimeOnly()}"></p>
+<p th:text="${enrollmentToken.getPolicy().getDisplayName()}"></p>
+<p th:text="${enrollmentToken.getPolicy().getId()}"></p>
+<p th:text="${enrollmentToken.getPolicy().getName()}"></p>
+<p th:text="${enrollmentToken.getPolicyName()}"></p>
+<p th:text="${enrollmentToken.getQrCode()}"></p>
+<p th:text="${enrollmentToken.getStatus()}"></p>
+<p th:text="${enrollmentToken.getValue()}"></p>
+
+<a th:href="@{/dashboard}">Dashboard</a>
+<a th:href="@{/enrollment-tokens/list}">Enrollment Tokens List</a>
+</body>
+</html>

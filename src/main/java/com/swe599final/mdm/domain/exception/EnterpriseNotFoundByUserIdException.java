@@ -1,6 +1,6 @@
 package com.swe599final.mdm.domain.exception;
 
-public class EnterpriseNotFoundByUserIdException extends Exception {
+final public class EnterpriseNotFoundByUserIdException extends Exception {
     public EnterpriseNotFoundByUserIdException(String msg) {
         super(msg);
     }

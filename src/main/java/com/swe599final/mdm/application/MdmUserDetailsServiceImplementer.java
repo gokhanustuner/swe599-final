@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class MdmUserDetailsServiceImplementer implements MdmUserDetailsService {
+final public class MdmUserDetailsServiceImplementer implements MdmUserDetailsService {
 
     @Autowired
     UserRepository userRepository;

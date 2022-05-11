@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-public class MdmUserDetailsImplementer implements MdmUserDetails {
+public final class MdmUserDetailsImplementer implements MdmUserDetails {
 
     private final User user;
 

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Enrollment Token creation failed</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <span class="alert alert-danger">Enrollment Token creation failed</span>
+    <p th:text="${error}"></p>
+    <a th:href="@{/enrollment-tokens/new}">Try again</a>
+</body>
+</html>

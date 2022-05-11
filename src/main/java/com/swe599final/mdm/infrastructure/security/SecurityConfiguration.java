@@ -24,15 +24,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/dashboard", "/enterprises/**", "/policies/**").authenticated()
-                .anyRequest().permitAll()
-                .and()
-                .formLogin()
-                .usernameParameter("email")
-                .defaultSuccessUrl("/dashboard")
-                .permitAll()
-                .and()
-                .logout().logoutSuccessUrl("/").permitAll();
+            .antMatchers("/dashboard", "/enterprises/**", "/policies/**", "/enrollment-tokens/**").authenticated()
+            .anyRequest().permitAll()
+            .and()
+            .formLogin()
+            .usernameParameter("email")
+            .defaultSuccessUrl("/dashboard")
+            .permitAll()
+            .and()
+            .logout().logoutSuccessUrl("/").permitAll();
 
         /*
         http.authorizeRequests()
