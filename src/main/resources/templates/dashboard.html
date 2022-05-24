@@ -4,15 +4,76 @@
     <meta charset="UTF-8">
     <title>MDM Dashboard</title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/style.css}" />
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
-    <h1 th:text="${principalName}"></h1>
-    <a th:href="@{/logout}">Logout</a>
-    <a th:unless="${applicationUserHasEnterprise}" th:href="@{/enterprises/new}">Create Enterprise</a>
-    <a th:if="${applicationUserHasEnterprise}" th:href="@{/enterprises/{enterpriseId}(enterpriseId=${applicationUsersEnterprise.getId()})}">My Enterprise</a>
-    <a th:if="${applicationUserHasEnterprise}" th:href="@{/policies/new}">New Policy</a>
-    <a th:if="${applicationUserHasEnterprise}" th:href="@{/policies/list}">List Policies</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/dashboard}">MDM</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/dashboard}">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarEnterprises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Enterprises
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarEnterprises">
+                            <li th:unless="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/enterprises/new}">Create Enterprise</a>
+                            </li>
+                            <li th:if="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/enterprises/{enterpriseId}(enterpriseId=${applicationUsersEnterprise.getId()})}">
+                                    My Enterprise
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarPolicies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Policies
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarPolicies">
+                            <li th:if="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/policies/new}">New Policy</a>
+                            </li>
+                            <li th:if="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/policies/list}">
+                                    List Policies
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarEnrollmentTokens" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Enrollment Tokens
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarEnrollmentTokens">
+                            <li th:if="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/enrollment-tokens/new}">New Enrollment Token</a>
+                            </li>
+                            <li th:if="${applicationUserHasEnterprise}">
+                                <a class="dropdown-item" th:href="@{/enrollment-tokens/list}">
+                                    List Enrollment Tokens
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/devices/list}">Devices</a>
+                    </li>
+                </ul>
+                <span class="navbar-text" th:text="${principalName}"></span>
+                &nbsp;&nbsp;
+                <a class="navbar-text" th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
 </body>
 </html>

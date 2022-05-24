@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class DashboardServiceImplementer implements DashboardService {
+public final class DashboardServiceImplementer implements DashboardService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public Enterprise getApplicationUsersEnterprise(UserDetails userDetails) {

@@ -1,6 +1,7 @@
 package com.swe599final.mdm.domain.service;
 
 import com.google.api.services.androidmanagement.v1.model.ContactInfo;
+import com.google.api.services.androidmanagement.v1.model.Empty;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
 import com.swe599final.mdm.infrastructure.model.*;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
-public class EnterpriseServiceImplementer implements EnterpriseService {
+public final class EnterpriseServiceImplementer implements EnterpriseService {
     @Autowired
     private AndroidManager androidManager;
 
@@ -70,12 +71,20 @@ public class EnterpriseServiceImplementer implements EnterpriseService {
     }
 
     @Override
-    public Enterprise update(EnterpriseId enterpriseId, String displayName, ContactInfo contactInfo) {
+    public Enterprise update(Long enterpriseId, String displayName, ContactInfo contactInfo, Authentication principal) {
         return null;
     }
 
     @Override
-    public void delete(EnterpriseId enterpriseId) {
+    public Empty delete(Long enterpriseId, Authentication principal)
+            throws IOException, EnterpriseNotFoundByUserIdException {
+        UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
+        MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 
+        Optional<Enterprise> enterprise = enterpriseRepository.findByIdAndUserId(enterpriseId, mappedUser.getId());
+        enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
+        Enterprise mdmEnterprise = enterprise.get();
+
+        return androidManager.deleteEnterprise(mdmEnterprise.getName());
     }
 }

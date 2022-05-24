@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Devices - MDM</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <p th:each="device : ${devices}">
+        <span th:text="${device.getName()}"> Device Name </span>
+        <span th:text="${device.getNonComplianceDetails()}"> Non-Compliance Details </span>
+    </p>
+</body>
+</html>

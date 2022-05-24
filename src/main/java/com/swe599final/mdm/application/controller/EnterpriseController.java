@@ -1,9 +1,12 @@
 package com.swe599final.mdm.application.controller;
 
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
+import com.swe599final.mdm.domain.service.DashboardService;
 import com.swe599final.mdm.domain.service.EnterpriseService;
+import com.swe599final.mdm.infrastructure.model.Enterprise;
 import com.swe599final.mdm.infrastructure.model.EnterpriseDto;
 import com.swe599final.mdm.infrastructure.model.EnterpriseResponse;
+import com.swe599final.mdm.infrastructure.model.MdmUserDetailsImplementer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -23,9 +26,20 @@ final public class EnterpriseController {
     @Autowired
     private EnterpriseService enterpriseService;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     @GetMapping("/enterprises/new")
-    public String getNewEnterprisePage(Model model) {
-        model.addAttribute("enterpriseDto", new EnterpriseDto());
+    public String getNewEnterprisePage(Model model, Authentication principal) {
+        Enterprise applicationUsersEnterprise =
+                dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
+        model.addAttribute("enterpriseDto", new EnterpriseDto())
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
+
         return "new_enterprise";
     }
 
@@ -53,7 +67,14 @@ final public class EnterpriseController {
         @ModelAttribute("enterprise") EnterpriseResponse enterprise,
         @ModelAttribute("success") String success
     ) throws IOException, EnterpriseNotFoundByUserIdException {
-        model.addAttribute("success", success);
+        Enterprise applicationUsersEnterprise =
+                dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
+        model.addAttribute("success", success)
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
         if (enterprise.getId() != null) {
             model.addAttribute("enterprise", enterprise);
         } else {

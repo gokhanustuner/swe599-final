@@ -1,0 +1,19 @@
+html, body {
+    min-height: 100% !important;
+    height: 100%;
+}
+
+body {
+    background-color: #eee;
+    background-image: url("android.png");
+    background-position: center;
+    background-size: 50%;
+    background-repeat: no-repeat;
+}
+
+.container {
+    --bs-bg-opacity: 0.9;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity))!important;
+    padding: 2em;
+    margin-top: 2em;
+}

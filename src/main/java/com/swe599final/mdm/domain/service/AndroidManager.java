@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-final public class AndroidManager {
+public final class AndroidManager {
     /** The JSON credential file for the service account. */
     private static final String SERVICE_ACCOUNT_CREDENTIAL_FILE = "/Users/gokhanustuner/Downloads/swe578-c6b0b00ff06c.json";
 
@@ -23,6 +22,12 @@ final public class AndroidManager {
     private static final String APP_NAME = "Android Management API sample app";
 
     private static final String PROJECT_ID = "swe578";
+
+    private static final String PUB_SUB_TOPIC = "projects/swe578/topics/device_enrollment";
+
+    private static final List<String> ENABLED_NOTIFICATION_TYPES = new ArrayList<>(
+        Arrays.asList("ENROLLMENT", "STATUS_REPORT")
+    );
 
     private final AndroidManagement androidManagementClient;
 
@@ -49,7 +54,13 @@ final public class AndroidManager {
             .create(enterprise)
             .setProjectId(PROJECT_ID)
             .setAgreementAccepted(true)
-            .execute();
+            .execute()
+            .setPubsubTopic(PUB_SUB_TOPIC)
+            .setEnabledNotificationTypes(ENABLED_NOTIFICATION_TYPES);
+    }
+
+    public Empty deleteEnterprise(String enterpriseName) throws IOException {
+        return androidManagementClient.enterprises().delete(enterpriseName).execute();
     }
 
     public Enterprise getEnterprise(String name) throws IOException {
@@ -73,9 +84,17 @@ final public class AndroidManager {
                 .setOneTimeOnly(true)
                 .setUser(new User().setAccountIdentifier(accountIdentifier))
                 .setPolicyName(policyId)
-                .setDuration("60s");
+                .setDuration("600s");
 
         return androidManagementClient.enterprises().enrollmentTokens().create(enterpriseName, token).execute();
+    }
+
+    public List<Device> listDevices(String enterpriseName) throws IOException {
+        return androidManagementClient.enterprises().devices().list(enterpriseName).execute().getDevices();
+    }
+
+    public Empty deleteDevice(String deviceName) throws IOException {
+        return androidManagementClient.enterprises().devices().delete(deviceName).execute();
     }
 
     private static AndroidManagement getAndroidManagementClient() throws IOException, GeneralSecurityException {

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
-final public class EnrollmentTokenServiceImplementer implements EnrollmentTokenService {
+public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenService {
     @Autowired
     private AndroidManager androidManager;
 

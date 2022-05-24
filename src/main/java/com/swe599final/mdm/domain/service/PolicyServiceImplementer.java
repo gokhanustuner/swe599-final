@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
-public class PolicyServiceImplementer implements PolicyService {
+public final class PolicyServiceImplementer implements PolicyService {
     @Autowired
     private AndroidManager androidManager;
 

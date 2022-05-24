@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserRegistrationServiceImplementer implements UserRegistrationService {
+public final class UserRegistrationServiceImplementer implements UserRegistrationService {
 
     @Autowired
     private UserRepository userRepository;
