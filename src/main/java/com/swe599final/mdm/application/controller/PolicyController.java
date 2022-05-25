@@ -3,9 +3,9 @@ package com.swe599final.mdm.application.controller;
 import com.google.api.services.androidmanagement.v1.model.ApplicationPolicy;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.exception.PolicyNotFoundByIdAndEnterpriseIdException;
+import com.swe599final.mdm.domain.service.DashboardService;
 import com.swe599final.mdm.domain.service.PolicyService;
-import com.swe599final.mdm.infrastructure.model.PolicyDto;
-import com.swe599final.mdm.infrastructure.model.PolicyResponse;
+import com.swe599final.mdm.infrastructure.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,8 +25,11 @@ final public class PolicyController {
     @Autowired
     private PolicyService policyService;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     @GetMapping("/policies/list")
-    public String listPolicies(Authentication principal) {
+    public String listPolicies(Model model, Authentication principal) {
 
         return "policies_list";
     }
@@ -52,11 +55,17 @@ final public class PolicyController {
     }
 
     @GetMapping("/policies/new")
-    public String newPolicy(Model model) {
+    public String newPolicy(Model model, Authentication principal) {
         PolicyDto policyDto = new PolicyDto();
         policyDto.addApplication(new ApplicationPolicy());
-        System.out.println(policyDto);
-        model.addAttribute("policy", policyDto);
+        Enterprise applicationUsersEnterprise =
+                dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+        model.addAttribute("policy", policyDto)
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
+
         return "policy_new";
     }
 

@@ -88,6 +88,11 @@ public final class PolicyServiceImplementer implements PolicyService {
     }
 
     @Override
+    public List<PolicyResponse> list(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+        return null;
+    }
+
+    @Override
     public PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal) {
         return null;
     }
