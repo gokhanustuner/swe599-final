@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,7 +41,7 @@ public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
     private MdmUserDetailsService userDetailsService;
 
     @Override
-    public EnrollmentTokenResponse create(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
+    public EnrollmentTokenResponse createEnrollmentToken(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException, WriterException,
                     DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
@@ -114,14 +116,49 @@ public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
     }
 
     @Override
-    public void delete(Long enrollmentTokenId, String enrollmentTokenName) throws IOException {
+    public void deleteEnrollmentToken(Long enrollmentTokenId, String enrollmentTokenName) throws IOException {
         enrollmentTokenRepository.deleteById(enrollmentTokenId);
         androidManager.deleteEnrollmentToken(enrollmentTokenName);
     }
 
     @Override
-    public EnrollmentTokenResponse get(Long enrollmentTokenId, Authentication principal)
-            throws IOException, EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException {
+    public List<EnrollmentTokenResponse> listEnrollmentTokens(Authentication principal) throws EnterpriseNotFoundByUserIdException {
+        UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
+        MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
+
+        Optional<Enterprise> enterprise = enterpriseRepository.findByUserId(mappedUser.getId());
+        enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
+        Enterprise mdmEnterprise = enterprise.get();
+
+        List<EnrollmentToken> mdmEnrollmentTokens = enrollmentTokenRepository.findByEnterpriseId(mdmEnterprise.getId());
+        List<EnrollmentTokenResponse> enrollmentTokenResponses = new ArrayList<>();
+
+        for(EnrollmentToken mdmEnrollmentToken : mdmEnrollmentTokens) {
+            EnrollmentTokenResponse enrollmentTokenResponse = new EnrollmentTokenResponse();
+            enrollmentTokenResponse.setId(mdmEnrollmentToken.getId());
+            enrollmentTokenResponse.setStatus(mdmEnrollmentToken.getStatus());
+            enrollmentTokenResponse.setQrCode(mdmEnrollmentToken.getQrCode());
+            enrollmentTokenResponse.setPolicy(mdmEnrollmentToken.getPolicy());
+            enrollmentTokenResponse.setName(mdmEnrollmentToken.getName());
+            enrollmentTokenResponse.setValue(mdmEnrollmentToken.getToken());
+            enrollmentTokenResponse.setDeviceUser(mdmEnrollmentToken.getDeviceUser());
+            enrollmentTokenResponse.setOneTimeOnly(mdmEnrollmentToken.getOneTimeOnly());
+            enrollmentTokenResponse.setPolicyName(mdmEnrollmentToken.getPolicyName());
+            enrollmentTokenResponse.setExpirationTimestamp(mdmEnrollmentToken.getExpirationTimestamp());
+            enrollmentTokenResponse.setAdditionalData(mdmEnrollmentToken.getAdditionalData());
+            enrollmentTokenResponse.setDuration(mdmEnrollmentToken.getDuration());
+            enrollmentTokenResponse.setAllowPersonalUsage(mdmEnrollmentToken.getAllowPersonalUsage());
+            enrollmentTokenResponse.setQrCodeFilePath(mdmEnrollmentToken.getQrCodeFilePath());
+            enrollmentTokenResponses.add(enrollmentTokenResponse);
+
+        }
+
+        return enrollmentTokenResponses;
+    }
+
+    @Override
+    public EnrollmentTokenResponse getEnrollmentToken(Long enrollmentTokenId, Authentication principal)
+            throws EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 

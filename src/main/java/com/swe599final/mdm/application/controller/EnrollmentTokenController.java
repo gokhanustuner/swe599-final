@@ -43,7 +43,16 @@ final public class EnrollmentTokenController {
     private DashboardService dashboardService;
 
     @GetMapping("/enrollment-tokens/list")
-    public String listEnrollmentTokens(Authentication principal) {
+    public String listEnrollmentTokens(Model model, Authentication principal) throws EnterpriseNotFoundByUserIdException {
+        Enterprise applicationUsersEnterprise =
+            dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
+        List<EnrollmentTokenResponse> enrollmentTokenResponses = enrollmentTokenService.listEnrollmentTokens(principal);
+        model.addAttribute("enrollmentTokens", enrollmentTokenResponses)
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
 
         return "enrollment_tokens_list";
     }
@@ -72,7 +81,7 @@ final public class EnrollmentTokenController {
                 .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId())
                 .addAttribute("deleteEnrollmentToken", deleteEnrollmentTokenDto);
         } else {
-            enrollmentToken = enrollmentTokenService.get(Long.valueOf(enrollmentTokenId), principal);
+            enrollmentToken = enrollmentTokenService.getEnrollmentToken(Long.valueOf(enrollmentTokenId), principal);
             deleteEnrollmentTokenDto.setId(enrollmentToken.getId());
             deleteEnrollmentTokenDto.setName(enrollmentToken.getName());
             model.addAttribute("enrollmentToken", enrollmentToken)
@@ -102,7 +111,7 @@ final public class EnrollmentTokenController {
     @PostMapping("/enrollment-tokens/create")
     public RedirectView createEnrollmentToken(EnrollmentTokenDto enrollmentTokenDto, Authentication principal, RedirectAttributes redirectAttributes) {
         try {
-            EnrollmentTokenResponse enrollmentTokenResponse = enrollmentTokenService.create(enrollmentTokenDto, principal);
+            EnrollmentTokenResponse enrollmentTokenResponse = enrollmentTokenService.createEnrollmentToken(enrollmentTokenDto, principal);
             redirectAttributes.addFlashAttribute("enrollmentToken", enrollmentTokenResponse);
             redirectAttributes.addFlashAttribute("success", true);
 
@@ -122,7 +131,7 @@ final public class EnrollmentTokenController {
         RedirectAttributes redirectAttributes
     ) {
         try {
-            enrollmentTokenService.delete(deleteEnrollmentTokenDto.getId(), deleteEnrollmentTokenDto.getName());
+            enrollmentTokenService.deleteEnrollmentToken(deleteEnrollmentTokenDto.getId(), deleteEnrollmentTokenDto.getName());
             redirectAttributes.addFlashAttribute("success", true);
 
             return new RedirectView("/dashboard");

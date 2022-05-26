@@ -10,12 +10,14 @@ import com.swe599final.mdm.infrastructure.model.EnrollmentTokenResponse;
 import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface EnrollmentTokenService {
-    EnrollmentTokenResponse create(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
+    EnrollmentTokenResponse createEnrollmentToken(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException,
                     DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException, WriterException;
-    void delete(Long enrollmentTokenId, String enrollmentTokenName) throws IOException;
-    EnrollmentTokenResponse get(Long enrollmentTokenId, Authentication principal)
-            throws IOException, EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException;
+    void deleteEnrollmentToken(Long enrollmentTokenId, String enrollmentTokenName) throws IOException;
+    List<EnrollmentTokenResponse> listEnrollmentTokens(Authentication principal) throws EnterpriseNotFoundByUserIdException;
+    EnrollmentTokenResponse getEnrollmentToken(Long enrollmentTokenId, Authentication principal)
+            throws EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException;
 }
