@@ -33,7 +33,6 @@ public final class DeviceController {
 
         List<Device> devices = deviceService.listDevices(principal);
         model.addAttribute("devices", devices)
-            .addAttribute("enterpriseDto", new EnterpriseDto())
             .addAttribute("principalName", principal.getName())
             .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
             .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)

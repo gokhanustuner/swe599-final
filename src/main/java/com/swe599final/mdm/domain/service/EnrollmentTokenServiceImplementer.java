@@ -114,8 +114,9 @@ public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
     }
 
     @Override
-    public EnrollmentTokenResponse delete(Long enrollmentTokenId) throws IOException {
-        return null;
+    public void delete(Long enrollmentTokenId, String enrollmentTokenName) throws IOException {
+        enrollmentTokenRepository.deleteById(enrollmentTokenId);
+        androidManager.deleteEnrollmentToken(enrollmentTokenName);
     }
 
     @Override

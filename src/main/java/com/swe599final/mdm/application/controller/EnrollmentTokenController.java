@@ -4,6 +4,7 @@ import com.swe599final.mdm.domain.exception.EnrollmentTokenNotFoundByIdAndEnterp
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
 import com.swe599final.mdm.domain.repository.PolicyRepository;
+import com.swe599final.mdm.domain.service.DashboardService;
 import com.swe599final.mdm.domain.service.EnrollmentTokenService;
 import com.swe599final.mdm.domain.service.MdmUserDetailsService;
 import com.swe599final.mdm.infrastructure.model.*;
@@ -38,6 +39,9 @@ final public class EnrollmentTokenController {
     @Autowired
     private MdmUserDetailsService userDetailsService;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     @GetMapping("/enrollment-tokens/list")
     public String listEnrollmentTokens(Authentication principal) {
 
@@ -52,13 +56,31 @@ final public class EnrollmentTokenController {
         @ModelAttribute("enrollmentToken") EnrollmentTokenResponse enrollmentToken,
         @ModelAttribute("success") String success
     ) throws IOException, EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException {
+        Enterprise applicationUsersEnterprise =
+            dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
         model.addAttribute("success", success);
+        DeleteEnrollmentTokenDto deleteEnrollmentTokenDto = new DeleteEnrollmentTokenDto();
 
         if (enrollmentToken.getId() != null) {
-            model.addAttribute("enrollmentToken", enrollmentToken);
+            deleteEnrollmentTokenDto.setId(enrollmentToken.getId());
+            deleteEnrollmentTokenDto.setName(enrollmentToken.getName());
+            model.addAttribute("enrollmentToken", enrollmentToken)
+                .addAttribute("principalName", principal.getName())
+                .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+                .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+                .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId())
+                .addAttribute("deleteEnrollmentToken", deleteEnrollmentTokenDto);
         } else {
             enrollmentToken = enrollmentTokenService.get(Long.valueOf(enrollmentTokenId), principal);
-            model.addAttribute("enrollmentToken", enrollmentToken);
+            deleteEnrollmentTokenDto.setId(enrollmentToken.getId());
+            deleteEnrollmentTokenDto.setName(enrollmentToken.getName());
+            model.addAttribute("enrollmentToken", enrollmentToken)
+                .addAttribute("principalName", principal.getName())
+                .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+                .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+                .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId())
+                .addAttribute("deleteEnrollmentToken", deleteEnrollmentTokenDto);
         }
 
         return "enrollment_token_detail";
@@ -90,6 +112,25 @@ final public class EnrollmentTokenController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
 
             return new RedirectView("/enrollment-tokens/creation-failed");
+        }
+    }
+
+    @PostMapping("/enrollment-tokens/delete")
+    public RedirectView deleteEnrollmentToken(
+        DeleteEnrollmentTokenDto deleteEnrollmentTokenDto,
+        Authentication principal,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            enrollmentTokenService.delete(deleteEnrollmentTokenDto.getId(), deleteEnrollmentTokenDto.getName());
+            redirectAttributes.addFlashAttribute("success", true);
+
+            return new RedirectView("/dashboard");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("success", false);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+
+            return new RedirectView("/dashboard");
         }
     }
 

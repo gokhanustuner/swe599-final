@@ -15,7 +15,7 @@ public interface EnrollmentTokenService {
     EnrollmentTokenResponse create(EnrollmentTokenDto enrollmentTokenDto, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException,
                     DeviceUserNotFoundByEnterpriseIdAndAccountIdentifierException, WriterException;
-    EnrollmentTokenResponse delete(Long enrollmentTokenId) throws IOException;
+    void delete(Long enrollmentTokenId, String enrollmentTokenName) throws IOException;
     EnrollmentTokenResponse get(Long enrollmentTokenId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, EnrollmentTokenNotFoundByIdAndEnterpriseIdException;
 }

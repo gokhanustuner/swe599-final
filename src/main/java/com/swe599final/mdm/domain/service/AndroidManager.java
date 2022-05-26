@@ -89,6 +89,10 @@ public final class AndroidManager {
         return androidManagementClient.enterprises().enrollmentTokens().create(enterpriseName, token).execute();
     }
 
+    public Empty deleteEnrollmentToken(String enrollmentTokenName) throws IOException {
+        return androidManagementClient.enterprises().enrollmentTokens().delete(enrollmentTokenName).execute();
+    }
+
     public List<Device> listDevices(String enterpriseName) throws IOException {
         return androidManagementClient.enterprises().devices().list(enterpriseName).execute().getDevices();
     }

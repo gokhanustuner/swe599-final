@@ -4,29 +4,150 @@
     <meta charset="UTF-8">
     <title th:text="${enrollmentToken.getName()}"></title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/style.css}" />
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var deleteEnrollmentTokenModal = document.getElementById('staticBackdrop')
+            deleteEnrollmentTokenModal.addEventListener('show.bs.modal', function (event) {
+                let button = event.relatedTarget
+                let deviceName = button.getAttribute('data-enrollment-token-name')
+                let modalBody = deleteEnrollmentTokenModal.querySelector('.modal-body')
+                let deleteButton = deleteEnrollmentTokenModal.querySelector(".btn-danger")
+
+                modalBody.textContent = 'Are you sure that you want to delete the enrollment token ' + deviceName
+                deleteButton.setAttribute('data-device-name', deviceName);
+            });
+
+            $(deleteEnrollmentTokenModal.querySelector(".btn-danger")).click(function () {
+                $("#delete-enrollment-token").submit();
+            })
+        });
+    </script>
 </head>
 <body>
-<span th:if="${success}" class="alert-success">Enrollment Token has successfully been created!</span>
-<p th:text="${enrollmentToken.getName()}"></p>
-<p th:text="${enrollmentToken.getName()}"></p>
-<p th:text="${enrollmentToken.getDeviceUser().getAccountIdentifier()}"></p>
-<p th:text="${enrollmentToken.getAdditionalData()}"></p>
-<p th:text="${enrollmentToken.getAllowPersonalUsage()}"></p>
-<p th:text="${enrollmentToken.getDuration()}"></p>
-<p th:text="${enrollmentToken.getExpirationTimestamp()}"></p>
-<p th:text="${enrollmentToken.getOneTimeOnly()}"></p>
-<p th:text="${enrollmentToken.getPolicy().getDisplayName()}"></p>
-<p th:text="${enrollmentToken.getPolicy().getId()}"></p>
-<p th:text="${enrollmentToken.getPolicy().getName()}"></p>
-<p th:text="${enrollmentToken.getPolicyName()}"></p>
-<p th:text="${enrollmentToken.getQrCode()}"></p>
-<p th:text="${enrollmentToken.getStatus()}"></p>
-<p th:text="${enrollmentToken.getValue()}"></p>
-<img th:src="@{${enrollmentToken.getQrCodeFilePath()}}" width="250" height="250">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/dashboard}">MDM</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarEnterprises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Enterprises
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarEnterprises">
+                        <li th:unless="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/enterprises/new}">Create Enterprise</a>
+                        </li>
+                        <li th:if="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/enterprises/{enterpriseId}(enterpriseId=${applicationUsersEnterprise.getId()})}">
+                                My Enterprise
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarPolicies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Policies
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarPolicies">
+                        <li th:if="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/policies/new}">New Policy</a>
+                        </li>
+                        <li th:if="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/policies/list}">
+                                List Policies
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" aria-current="page" href="#" id="navbarEnrollmentTokens" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Enrollment Tokens
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarEnrollmentTokens">
+                        <li th:if="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/enrollment-tokens/new}">New Enrollment Token</a>
+                        </li>
+                        <li th:if="${applicationUserHasEnterprise}">
+                            <a class="dropdown-item" th:href="@{/enrollment-tokens/list}">
+                                List Enrollment Tokens
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/devices/list}">Device Inventory</a>
+                </li>
+            </ul>
+            <span class="navbar-text" th:text="${principalName}"></span>
+            <a class="navbar-text" th:href="@{/logout}">Logout</a>
+        </div>
+    </div>
+</nav>
+<span th:if="${success} != ''" class="alert-success">Enrollment Token has successfully been created!</span>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Device User</th>
+        <th scope="col">Personal Usage</th>
+        <th scope="col">Validity Duration</th>
+        <th scope="col">Expiration Date</th>
+        <th scope="col">One Time Only</th>
+        <th scope="col">Policy</th>
+        <th scope="col">#</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td th:text="${enrollmentToken.getDeviceUser().getAccountIdentifier()}"></td>
+        <td th:text="${enrollmentToken.getAllowPersonalUsage()}"></td>
+        <td th:text="${enrollmentToken.getDuration()}"></td>
+        <td th:text="${enrollmentToken.getExpirationTimestamp()}"></td>
+        <td th:text="${enrollmentToken.getOneTimeOnly()}"></td>
+        <td>
+            <a th:href="@{/policies/{policyId}(policyId=${enrollmentToken.getPolicy().getId()})}" th:text="${enrollmentToken.getPolicy().getDisplayName()}"></a>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger delete-enrollment-token"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    th:data-enrollment-token-name="${enrollmentToken.getName()}"
+            >Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p class="text-center">
+    Read QR Code below to enroll your device
+    <img style="display: block; margin: 1em auto;" th:src="@{${enrollmentToken.getQrCodeFilePath()}}" width="250" height="250">
+</p>
+<form method="post" th:action="@{/enrollment-tokens/delete}" th:object="${deleteEnrollmentToken}" id="delete-enrollment-token">
+    <input type="hidden" th:field="*{id}">
+    <input type="hidden" th:field="*{name}">
+</form>
 
-<a th:href="@{/dashboard}">Dashboard</a>
-<a th:href="@{/enrollment-tokens/list}">Enrollment Tokens List</a>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Delete Enrollment Token</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
