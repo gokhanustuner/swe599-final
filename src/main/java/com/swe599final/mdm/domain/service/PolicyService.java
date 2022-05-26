@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PolicyService {
-    PolicyResponse create(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
-    PolicyResponse get(Long policyId, Authentication principal)
+    PolicyResponse createPolicy(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    PolicyResponse getPolicy(Long policyId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException;
-    List<PolicyResponse> list(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    List<PolicyResponse> listPolicies(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
     PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal);
-    void delete(Long policyId);
+    void deletePolicy(Long policyId, String policyName) throws IOException;
 }

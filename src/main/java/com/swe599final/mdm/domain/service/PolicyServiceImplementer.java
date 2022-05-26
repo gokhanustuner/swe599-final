@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public final class PolicyServiceImplementer implements PolicyService {
@@ -28,7 +30,7 @@ public final class PolicyServiceImplementer implements PolicyService {
     private MdmUserDetailsService userDetailsService;
 
     @Override
-    public PolicyResponse create(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+    public PolicyResponse createPolicy(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 
@@ -60,7 +62,7 @@ public final class PolicyServiceImplementer implements PolicyService {
     }
 
     @Override
-    public PolicyResponse get(Long policyId, Authentication principal)
+    public PolicyResponse getPolicy(Long policyId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
@@ -88,8 +90,39 @@ public final class PolicyServiceImplementer implements PolicyService {
     }
 
     @Override
-    public List<PolicyResponse> list(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
-        return null;
+    public List<PolicyResponse> listPolicies(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+        UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
+        MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
+
+        Optional<Enterprise> enterprise = enterpriseRepository.findByUserId(mappedUser.getId());
+        enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
+        Enterprise mdmEnterprise = enterprise.get();
+
+        List<Policy> mdmPolicies = policyRepository.findByEnterpriseId(mdmEnterprise.getId());
+        List<com.google.api.services.androidmanagement.v1.model.Policy> androidPolicies = androidManager.listPolicies(mdmEnterprise.getName());
+        List<PolicyResponse> policyResponses = new ArrayList<>();
+
+        for(int i = 0; i < mdmPolicies.size(); i++) {
+            int finalI = i;
+            com.google.api.services.androidmanagement.v1.model.Policy androidPolicy = androidPolicies.stream().filter(
+                new Predicate<com.google.api.services.androidmanagement.v1.model.Policy>() {
+                    @Override
+                    public boolean test(com.google.api.services.androidmanagement.v1.model.Policy androidPolicy) {
+                        return mdmPolicies.get(finalI).getName().equals(androidPolicy.getName());
+                    }
+                }
+            ).collect(Collectors.toList()).get(0);
+            Policy mdmPolicy = mdmPolicies.get(i);
+            PolicyResponse policyResponse = new PolicyResponse();
+            policyResponse.setId(mdmPolicy.getId());
+            policyResponse.setName(androidPolicy.getName());
+            policyResponse.setDisplayName(mdmPolicy.getDisplayName());
+            policyResponse.setInitial(mdmPolicy.isInitial());
+            policyResponse.setApplications(androidPolicy.getApplications());
+            policyResponses.add(policyResponse);
+        }
+
+        return policyResponses;
     }
 
     @Override
@@ -98,7 +131,8 @@ public final class PolicyServiceImplementer implements PolicyService {
     }
 
     @Override
-    public void delete(Long policyId) {
-
+    public void deletePolicy(Long policyId, String policyName) throws IOException {
+        policyRepository.deleteById(policyId);
+        androidManager.deletePolicy(policyName);
     }
 }

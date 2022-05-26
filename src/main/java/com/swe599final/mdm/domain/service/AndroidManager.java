@@ -38,12 +38,6 @@ public final class AndroidManager {
     public Enterprise createEnterprise(String displayName, String email) throws IOException {
         ContactInfo contactInfo = new ContactInfo();
         contactInfo.setContactEmail(email);
-        // contactInfo.setDataProtectionOfficerName("John Doe");
-        // contactInfo.setDataProtectionOfficerEmail("dpo@example.com");
-        // contactInfo.setDataProtectionOfficerPhone("+33 1 99 00 98 76 54");
-        // contactInfo.setEuRepresentativeName("Jane Doe");
-        // contactInfo.setEuRepresentativeEmail("eurep@example.com");
-        // contactInfo.setEuRepresentativePhone("+33 1 99 00 12 34 56");
 
         Enterprise enterprise = new Enterprise();
         enterprise.setEnterpriseDisplayName(displayName);
@@ -75,6 +69,14 @@ public final class AndroidManager {
 
     public Policy getPolicy(String name) throws IOException {
         return androidManagementClient.enterprises().policies().get(name).execute();
+    }
+
+    public Empty deletePolicy(String policyName) throws IOException {
+        return androidManagementClient.enterprises().policies().delete(policyName).execute();
+    }
+
+    public List<Policy> listPolicies(String enterpriseName) throws IOException {
+        return androidManagementClient.enterprises().policies().list(enterpriseName).setPageSize(1000).execute().getPolicies();
     }
 
     public EnrollmentToken createEnrollmentToken(String policyId, String enterpriseName, String accountIdentifier) throws IOException {

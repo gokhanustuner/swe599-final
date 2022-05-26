@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 final public class PolicyController {
@@ -29,7 +30,16 @@ final public class PolicyController {
     private DashboardService dashboardService;
 
     @GetMapping("/policies/list")
-    public String listPolicies(Model model, Authentication principal) {
+    public String listPolicies(Model model, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+        Enterprise applicationUsersEnterprise =
+            dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
+        List<PolicyResponse> policyResponses = policyService.listPolicies(principal);
+        model.addAttribute("policies", policyResponses)
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
 
         return "policies_list";
     }
@@ -42,16 +52,53 @@ final public class PolicyController {
         @ModelAttribute("policy") PolicyResponse policy,
         @ModelAttribute("success") String success
     ) throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException {
+        Enterprise applicationUsersEnterprise =
+                dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
+        DeletePolicyDto deletePolicyDto = new DeletePolicyDto();
         model.addAttribute("success", success);
 
         if (policy.getId() != null) {
-            model.addAttribute("policy", policy);
+            deletePolicyDto.setId(policy.getId());
+            deletePolicyDto.setName(policy.getName());
+
+            model.addAttribute("policy", policy)
+                .addAttribute("principalName", principal.getName())
+                .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+                .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+                .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId())
+                .addAttribute("deletePolicy", deletePolicyDto);
         } else {
-            policy = policyService.get(Long.valueOf(policyId), principal);
-            model.addAttribute("policy", policy);
+            policy = policyService.getPolicy(Long.valueOf(policyId), principal);
+            deletePolicyDto.setId(policy.getId());
+            deletePolicyDto.setName(policy.getName());
+            model.addAttribute("policy", policy)
+                .addAttribute("principalName", principal.getName())
+                .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+                .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+                .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId())
+                .addAttribute("deletePolicy", deletePolicyDto);
         }
 
         return "policy_detail";
+    }
+
+    @PostMapping("/policies/delete")
+    public RedirectView deletePolicy(
+        DeletePolicyDto deletePolicyDto,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            policyService.deletePolicy(deletePolicyDto.getId(), deletePolicyDto.getName());
+            redirectAttributes.addFlashAttribute("success", true);
+
+            return new RedirectView("/dashboard");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("success", false);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+
+            return new RedirectView("/dashboard");
+        }
     }
 
     @GetMapping("/policies/new")
@@ -72,7 +119,7 @@ final public class PolicyController {
     @PostMapping("/policies/create")
     public RedirectView createPolicy(PolicyDto policyDto, Authentication principal, RedirectAttributes redirectAttributes) {
         try {
-            PolicyResponse policyResponse = policyService.create(policyDto, principal);
+            PolicyResponse policyResponse = policyService.createPolicy(policyDto, principal);
             redirectAttributes.addFlashAttribute("policy", policyResponse);
             redirectAttributes.addFlashAttribute("success", true);
 
