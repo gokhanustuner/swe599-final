@@ -97,6 +97,9 @@ final public class EnrollmentTokenController {
 
     @GetMapping("/enrollment-tokens/new")
     public String newEnrollmentToken(Model model, Authentication principal) throws EnterpriseNotFoundByUserIdException {
+        Enterprise applicationUsersEnterprise =
+                dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
+
         EnrollmentTokenDto enrollmentTokenDto = new EnrollmentTokenDto();
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
@@ -104,7 +107,12 @@ final public class EnrollmentTokenController {
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         List<Policy> policies = policyRepository.findByEnterpriseId(enterprise.get().getId());
         enrollmentTokenDto.setPolicies(policies);
-        model.addAttribute("enrollmentToken", enrollmentTokenDto);
+        model.addAttribute("enrollmentToken", enrollmentTokenDto)
+            .addAttribute("principalName", principal.getName())
+            .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
+            .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
+            .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
+
         return "enrollment_token_new";
     }
 

@@ -126,11 +126,6 @@ public final class PolicyServiceImplementer implements PolicyService {
     }
 
     @Override
-    public PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal) {
-        return null;
-    }
-
-    @Override
     public void deletePolicy(Long policyId, String policyName) throws IOException {
         policyRepository.deleteById(policyId);
         androidManager.deletePolicy(policyName);

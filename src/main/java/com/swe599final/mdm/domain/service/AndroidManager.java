@@ -86,7 +86,7 @@ public final class AndroidManager {
                 .setOneTimeOnly(true)
                 .setUser(new User().setAccountIdentifier(accountIdentifier))
                 .setPolicyName(policyId)
-                .setDuration("600s");
+                .setDuration("3600s");
 
         return androidManagementClient.enterprises().enrollmentTokens().create(enterpriseName, token).execute();
     }

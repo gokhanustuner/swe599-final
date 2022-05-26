@@ -14,6 +14,5 @@ public interface PolicyService {
     PolicyResponse getPolicy(Long policyId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException, PolicyNotFoundByIdAndEnterpriseIdException;
     List<PolicyResponse> listPolicies(Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
-    PolicyResponse update(Long policyId, PolicyDto policyDto, Authentication principal);
     void deletePolicy(Long policyId, String policyName) throws IOException;
 }

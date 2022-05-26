@@ -1,6 +1,5 @@
 package com.swe599final.mdm.domain.service;
 
-import com.google.api.services.androidmanagement.v1.model.ContactInfo;
 import com.google.api.services.androidmanagement.v1.model.Empty;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
@@ -68,11 +67,6 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
         enterpriseResponse.setEmail(androidEnterprise.getContactInfo().getContactEmail());
 
         return enterpriseResponse;
-    }
-
-    @Override
-    public Enterprise update(Long enterpriseId, String displayName, ContactInfo contactInfo, Authentication principal) {
-        return null;
     }
 
     @Override
