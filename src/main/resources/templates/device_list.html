@@ -7,6 +7,25 @@
     <link th:rel="stylesheet" th:href="@{/css/style.css}" />
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var deleteDeviceModal = document.getElementById('staticBackdrop')
+            deleteDeviceModal.addEventListener('show.bs.modal', function (event) {
+                let button = event.relatedTarget
+                let deviceName = button.getAttribute('data-device-name')
+                let modalBody = deleteDeviceModal.querySelector('.modal-body')
+                let deleteButton = deleteDeviceModal.querySelector(".btn-danger")
+
+                modalBody.textContent = 'Are you sure that you want to delete the device ' + deviceName
+                deleteButton.setAttribute('data-device-name', deviceName);
+            });
+
+            $(deleteDeviceModal.querySelector(".btn-danger")).click(function () {
+                $("#delete-device #name").val($(this).data("device-name"));
+                $("#delete-device").submit();
+            })
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -77,7 +96,6 @@
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">#</th>
             <th scope="col">Brand</th>
             <th scope="col">Model</th>
             <th scope="col">Version</th>
@@ -87,13 +105,15 @@
             <th scope="col">Storage</th>
             <th scope="col">Ram</th>
             <th scope="col">Ownership</th>
+            <th scope="col">Management Mode</th>
             <th scope="col">User</th>
             <th scope="col">Enrollment Time</th>
+            <th scope="col">State</th>
+            <th scope="col">#</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="device : ${devices}">
-            <th scope="row" th:text="${device.getName()}"></th>
             <td th:text="${device.getHardwareInfo().getBrand()}"></td>
             <td th:text="${device.getHardwareInfo().getModel()}"></td>
             <td th:text="${device.getHardwareInfo().getDeviceBasebandVersion()}"></td>
@@ -103,10 +123,44 @@
             <td th:text="${device.getMemoryInfo().getTotalInternalStorage() + ' B'}"></td>
             <td th:text="${device.getMemoryInfo().getTotalRam() + ' B'}"></td>
             <td th:text="${device.getOwnership()}"></td>
+            <td th:text="${device.getManagementMode()}"></td>
             <td th:text="${device.getUser().getAccountIdentifier()}"></td>
             <td th:text="${device.getEnrollmentTime().toString()}"></td>
+            <td th:switch="${device.getState()}">
+                <a href="#" style="color: #fff !important; text-decoration: none;" class="badge alert-success" th:case="'ACTIVE'" th:text="${device.getState()}"></a>
+                <a href="#" style="color: #fff !important; text-decoration: none;" class="badge badge-danger" th:case="'DISABLED'" th:text="${device.getState()}"></a>
+                <a href="#" style="color: #fff !important; text-decoration: none;" class="badge badge-dark" th:case="'DELETED'" th:text="${device.getState()}"></a>
+                <a href="#" style="color: #fff !important; text-decoration: none;" class="badge badge-info" th:case="'DEVICE_STATE_UNSPECIFIED'" th:text="${device.getState()}"></a>
+                <a href="#" style="color: #fff !important; text-decoration: none;" class="badge badge-warning" th:case="'PROVISIONING'" th:text="${device.getState()}"></a>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger delete-device"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        th:data-device-name="${device.getName()}"
+                >Delete</button>
+            </td>
         </tr>
         </tbody>
     </table>
+    <form method="post" th:action="@{/devices/delete}" th:object="${deleteDevice}" id="delete-device">
+        <input type="hidden" th:field="*{name}">
+    </form>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Delete Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
