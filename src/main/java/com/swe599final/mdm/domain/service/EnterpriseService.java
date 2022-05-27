@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public interface EnterpriseService {
-    EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, GeneralSecurityException;
-    EnterpriseResponse get(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
-    Empty delete(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    EnterpriseResponse createEnterprise(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, GeneralSecurityException;
+    EnterpriseResponse getEnterprise(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
+    Empty deleteEnterprise(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException;
 }

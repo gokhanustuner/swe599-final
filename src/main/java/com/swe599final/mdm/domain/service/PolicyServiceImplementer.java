@@ -37,13 +37,14 @@ public final class PolicyServiceImplementer implements PolicyService {
         Optional<Enterprise> enterprise = enterpriseRepository.findByUserId(mappedUser.getId());
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();
+
         com.google.api.services.androidmanagement.v1.model.Policy androidPolicy =
             androidManager.createPolicy(
                 mdmEnterprise.getName(),
                 new com.google.api.services.androidmanagement.v1.model.Policy()
                         .setApplications(policyDto.getApplications())
             );
-
+        System.out.println(androidPolicy);
         Policy mdmPolicy = new Policy();
         mdmPolicy.setDisplayName(policyDto.getDisplayName());
         mdmPolicy.setName(androidPolicy.getName());

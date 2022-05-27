@@ -12,12 +12,10 @@
             var deleteEnrollmentTokenModal = document.getElementById('staticBackdrop')
             deleteEnrollmentTokenModal.addEventListener('show.bs.modal', function (event) {
                 let button = event.relatedTarget
-                let deviceName = button.getAttribute('data-enrollment-token-name')
+                let enrollmentTokenName = button.getAttribute('data-enrollment-token-name')
                 let modalBody = deleteEnrollmentTokenModal.querySelector('.modal-body')
-                let deleteButton = deleteEnrollmentTokenModal.querySelector(".btn-danger")
 
-                modalBody.textContent = 'Are you sure that you want to delete the enrollment token ' + deviceName
-                deleteButton.setAttribute('data-device-name', deviceName);
+                modalBody.textContent = 'Are you sure that you want to delete the enrollment token ' + enrollmentTokenName
             });
 
             $(deleteEnrollmentTokenModal.querySelector(".btn-danger")).click(function () {
@@ -102,7 +100,7 @@
         <th scope="col">Expiration Date</th>
         <th scope="col">One Time Only</th>
         <th scope="col">Policy</th>
-        <th scope="col">#</th>
+        <th scope="col">Actions</th>
     </tr>
     </thead>
     <tbody>

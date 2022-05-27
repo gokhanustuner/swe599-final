@@ -1,6 +1,6 @@
 package com.swe599final.mdm.infrastructure.model;
 
-public class DeleteEnrollmentTokenDto {
+public final class DeleteEnrollmentTokenDto {
     private Long id;
 
     private String name;

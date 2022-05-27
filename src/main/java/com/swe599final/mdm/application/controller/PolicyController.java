@@ -138,8 +138,13 @@ final public class PolicyController {
         @ModelAttribute("success") String success,
         @ModelAttribute("error") String error
     ) {
-        model.addAttribute("success", success);
-        model.addAttribute("error", error);
+        try {
+            model.addAttribute("success", success);
+            model.addAttribute("error", error);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
 
         return "policy_fail";
     }

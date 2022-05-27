@@ -14,10 +14,8 @@
                 let button = event.relatedTarget
                 let policyName = button.getAttribute('data-policy-name')
                 let modalBody = deletePolicyModal.querySelector('.modal-body')
-                let deleteButton = deletePolicyModal.querySelector(".btn-danger")
 
-                modalBody.textContent = 'Are you sure that you want to delete the enrollment token ' + policyName
-                deleteButton.setAttribute('data-device-name', policyName);
+                modalBody.textContent = 'Are you sure that you want to delete the policy ' + policyName
             });
 
             $(deletePolicyModal.querySelector(".btn-danger")).click(function () {

@@ -3,10 +3,7 @@ package com.swe599final.mdm.application.controller;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.service.DashboardService;
 import com.swe599final.mdm.domain.service.EnterpriseService;
-import com.swe599final.mdm.infrastructure.model.Enterprise;
-import com.swe599final.mdm.infrastructure.model.EnterpriseDto;
-import com.swe599final.mdm.infrastructure.model.EnterpriseResponse;
-import com.swe599final.mdm.infrastructure.model.MdmUserDetailsImplementer;
+import com.swe599final.mdm.infrastructure.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -46,7 +43,7 @@ final public class EnterpriseController {
     @PostMapping("/enterprises/create")
     public RedirectView postCreateEnterpriseForm(EnterpriseDto enterpriseDto, Authentication principal, RedirectAttributes redirectAttributes) {
         try {
-            EnterpriseResponse enterpriseResponse = enterpriseService.create(enterpriseDto, principal);
+            EnterpriseResponse enterpriseResponse = enterpriseService.createEnterprise(enterpriseDto, principal);
             redirectAttributes.addFlashAttribute("enterprise", enterpriseResponse);
             redirectAttributes.addFlashAttribute("success", true);
 
@@ -70,19 +67,46 @@ final public class EnterpriseController {
         Enterprise applicationUsersEnterprise =
                 dashboardService.getApplicationUsersEnterprise((MdmUserDetailsImplementer) principal.getPrincipal());
 
+        DeleteEnterpriseDto deleteEnterpriseDto = new DeleteEnterpriseDto();
+
         model.addAttribute("success", success)
             .addAttribute("principalName", principal.getName())
             .addAttribute("applicationUserHasEnterprise", applicationUsersEnterprise != null)
             .addAttribute("applicationUsersEnterprise", applicationUsersEnterprise)
             .addAttribute("principalId", ((MdmUserDetailsImplementer) principal.getPrincipal()).getId());
         if (enterprise.getId() != null) {
-            model.addAttribute("enterprise", enterprise);
+            deleteEnterpriseDto.setId(enterprise.getId());
+            deleteEnterpriseDto.setName(enterprise.getName());
+            model.addAttribute("enterprise", enterprise)
+                .addAttribute("deleteEnterprise", deleteEnterpriseDto);
         } else {
-            enterprise = enterpriseService.get(Long.valueOf(enterpriseId), principal);
-            model.addAttribute("enterprise", enterprise);
+            enterprise = enterpriseService.getEnterprise(Long.valueOf(enterpriseId), principal);
+            deleteEnterpriseDto.setId(enterprise.getId());
+            deleteEnterpriseDto.setName(enterprise.getName());
+            model.addAttribute("enterprise", enterprise)
+                .addAttribute("deleteEnterprise", deleteEnterpriseDto);
         }
 
         return "enterprise_detail";
+    }
+
+    @PostMapping("/enterprises/delete")
+    public RedirectView deleteEnterprise(
+        DeleteEnterpriseDto deleteEnterpriseDto,
+        RedirectAttributes redirectAttributes,
+        Authentication principal
+    ) throws IOException, EnterpriseNotFoundByUserIdException {
+        try {
+            enterpriseService.deleteEnterprise(deleteEnterpriseDto.getId(), principal);
+            redirectAttributes.addFlashAttribute("success", true);
+
+            return new RedirectView("/dashboard");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("success", false);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+
+            return new RedirectView("/dashboard");
+        }
     }
 
     @GetMapping("/enterprises/creation-failed")

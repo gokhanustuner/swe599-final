@@ -25,7 +25,7 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
     private MdmUserDetailsService userDetailsService;
 
     @Override
-    public EnterpriseResponse create(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, UsernameNotFoundException {
+    public EnterpriseResponse createEnterprise(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, UsernameNotFoundException {
         com.google.api.services.androidmanagement.v1.model.Enterprise androidEnterprise =
                 androidManager.createEnterprise(enterpriseDto.getDisplayName(), enterpriseDto.getEmail());
 
@@ -49,7 +49,7 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
     }
 
     @Override
-    public EnterpriseResponse get(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+    public EnterpriseResponse getEnterprise(Long enterpriseId, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 
@@ -70,7 +70,7 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
     }
 
     @Override
-    public Empty delete(Long enterpriseId, Authentication principal)
+    public Empty deleteEnterprise(Long enterpriseId, Authentication principal)
             throws IOException, EnterpriseNotFoundByUserIdException {
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
@@ -78,6 +78,7 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
         Optional<Enterprise> enterprise = enterpriseRepository.findByIdAndUserId(enterpriseId, mappedUser.getId());
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();
+        enterpriseRepository.deleteById(mdmEnterprise.getId());
 
         return androidManager.deleteEnterprise(mdmEnterprise.getName());
     }

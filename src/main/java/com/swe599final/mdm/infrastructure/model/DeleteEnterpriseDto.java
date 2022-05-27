@@ -1,6 +1,6 @@
 package com.swe599final.mdm.infrastructure.model;
 
-public final class DeletePolicyDto {
+public final class DeleteEnterpriseDto {
     private Long id;
 
     private String name;

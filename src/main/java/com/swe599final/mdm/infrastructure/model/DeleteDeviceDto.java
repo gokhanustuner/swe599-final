@@ -1,6 +1,6 @@
 package com.swe599final.mdm.infrastructure.model;
 
-public class DeleteDeviceDto {
+public final class DeleteDeviceDto {
     private String name;
 
     public String getName() {

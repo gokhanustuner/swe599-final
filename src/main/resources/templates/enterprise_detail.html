@@ -7,6 +7,22 @@
     <link th:rel="stylesheet" th:href="@{/css/style.css}" />
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var deleteEnterpriseModal = document.getElementById('staticBackdrop')
+            deleteEnterpriseModal.addEventListener('show.bs.modal', function (event) {
+                let button = event.relatedTarget
+                let enterpriseName = button.getAttribute('data-enterprise-name')
+                let modalBody = deleteEnterpriseModal.querySelector('.modal-body')
+
+                modalBody.textContent = 'Are you sure that you want to delete the enterprise ' + enterpriseName
+            });
+
+            $(deleteEnterpriseModal.querySelector(".btn-danger")).click(function () {
+                $("#delete-enterprise").submit();
+            })
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -85,6 +101,7 @@
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">Contact Email</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -92,9 +109,35 @@
             <th scope="row" th:text="${enterprise.id}"></th>
             <td th:text="${enterprise.getDisplayName()}"></td>
             <td th:text="${enterprise.getEmail()}"></td>
+            <td>
+                <button type="button" class="btn btn-danger delete-enterprise"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        th:data-enterprise-name="${enterprise.getName()}"
+                >Delete</button>
+            </td>
         </tr>
         </tbody>
     </table>
-    <a class="btn btn-primary" th:href="@{/dashboard}" role="button">Go to Dashboard</a>
+    <form method="post" th:action="@{/enterprises/delete}" th:object="${deleteEnterprise}" id="delete-enterprise">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{name}">
+    </form>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Delete Enterprise</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

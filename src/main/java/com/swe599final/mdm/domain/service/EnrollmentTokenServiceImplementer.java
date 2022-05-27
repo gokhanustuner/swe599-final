@@ -106,7 +106,7 @@ public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
             enrollmentTokenResponse.setQrCode(androidEnrollmentToken.getQrCode());
             enrollmentTokenResponse.setDeviceUser(mdmDeviceUser);
             enrollmentTokenResponse.setStatus(EnrollmentTokenStatus.QUEUE);
-            enrollmentTokenResponse.setQrCodeFilePath(qrCodeFilePath);
+            enrollmentTokenResponse.setQrCodeFilePath(mdmEnrollmentToken.getQrCodeFilePath());
 
             return enrollmentTokenResponse;
         } catch (Exception e) {
@@ -116,7 +116,9 @@ public final class EnrollmentTokenServiceImplementer implements EnrollmentTokenS
     }
 
     @Override
-    public void deleteEnrollmentToken(Long enrollmentTokenId, String enrollmentTokenName) throws IOException {
+    public void deleteEnrollmentToken(Long enrollmentTokenId, String enrollmentTokenName) throws IOException, Exception {
+        Optional<EnrollmentToken> enrollmentToken = enrollmentTokenRepository.findById(enrollmentTokenId);
+        enrollmentToken.orElseThrow(() -> new Exception("Enrollment token not found with id: " + enrollmentTokenId));
         enrollmentTokenRepository.deleteById(enrollmentTokenId);
         androidManager.deleteEnrollmentToken(enrollmentTokenName);
     }
