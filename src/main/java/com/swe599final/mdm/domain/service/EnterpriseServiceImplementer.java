@@ -2,6 +2,7 @@ package com.swe599final.mdm.domain.service;
 
 import com.google.api.services.androidmanagement.v1.model.Empty;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
+import com.swe599final.mdm.domain.repository.DeviceUserRepository;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
 import com.swe599final.mdm.infrastructure.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
 
     @Autowired
     private MdmUserDetailsService userDetailsService;
+
+    @Autowired
+    private DeviceUserRepository deviceUserRepository;
 
     @Override
     public EnterpriseResponse createEnterprise(EnterpriseDto enterpriseDto, Authentication principal) throws IOException, UsernameNotFoundException {
@@ -78,6 +82,7 @@ public final class EnterpriseServiceImplementer implements EnterpriseService {
         Optional<Enterprise> enterprise = enterpriseRepository.findByIdAndUserId(enterpriseId, mappedUser.getId());
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();
+        deviceUserRepository.deleteAll();
         enterpriseRepository.deleteById(mdmEnterprise.getId());
 
         return androidManager.deleteEnterprise(mdmEnterprise.getName());
