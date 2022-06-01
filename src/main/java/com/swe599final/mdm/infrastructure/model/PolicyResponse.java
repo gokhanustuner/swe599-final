@@ -13,6 +13,10 @@ public final class PolicyResponse {
 
     private List<ApplicationPolicy> applications;
 
+    private String passwordQuality = "";
+
+    private String passwordScope = "";
+
     private boolean initial;
 
     public Long getId() {
@@ -45,6 +49,22 @@ public final class PolicyResponse {
 
     public void setApplications(List<ApplicationPolicy> applications) {
         this.applications = applications;
+    }
+
+    public String getPasswordQuality() {
+        return passwordQuality;
+    }
+
+    public void setPasswordQuality(String passwordQuality) {
+        this.passwordQuality = passwordQuality;
+    }
+
+    public String getPasswordScope() {
+        return passwordScope;
+    }
+
+    public void setPasswordScope(String passwordScope) {
+        this.passwordScope = passwordScope;
     }
 
     public boolean isInitial() {

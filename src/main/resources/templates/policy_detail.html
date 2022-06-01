@@ -97,6 +97,7 @@
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">Applications</th>
+            <th scope="col">Security Requirements</th>
             <th scope="col">Actions</th>
         </tr>
         </thead>
@@ -120,6 +121,20 @@
                             <td th:text="${applicationPolicy.getInstallType()}"></td>
                             <td th:text="${applicationPolicy.getDefaultPermissionPolicy()}"></td>
                         </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>Password quality: </td>
+                        <td th:text="${policy.getPasswordQuality()}"></td>
+                    </tr>
+                    <tr>
+                        <td>Password scope: </td>
+                        <td th:text="${policy.getPasswordScope()}"></td>
+                    </tr>
                     </tbody>
                 </table>
             </td>

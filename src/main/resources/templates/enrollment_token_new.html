@@ -83,7 +83,7 @@
             <div class="form-group row my-3">
                 <label class="col-4 col-form-label">Policy: </label>
                 <div class="col-8">
-                    <select th:field="*{policyId}" class="form-control" id="dropDownList">
+                    <select th:field="*{policyId}" class="form-select" id="dropDownList">
                         <option value="0">select option</option>
                         <option th:each="policy : ${enrollmentToken.getPolicies()}" th:value="${policy.getId()}" th:text="${policy.getDisplayName()}"></option>
                     </select>

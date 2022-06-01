@@ -1,5 +1,6 @@
 package com.swe599final.mdm.domain.service;
 
+import com.google.api.services.androidmanagement.v1.model.PasswordRequirements;
 import com.swe599final.mdm.domain.exception.EnterpriseNotFoundByUserIdException;
 import com.swe599final.mdm.domain.exception.PolicyNotFoundByIdAndEnterpriseIdException;
 import com.swe599final.mdm.domain.repository.EnterpriseRepository;
@@ -31,20 +32,47 @@ public final class PolicyServiceImplementer implements PolicyService {
 
     @Override
     public PolicyResponse createPolicy(PolicyDto policyDto, Authentication principal) throws IOException, EnterpriseNotFoundByUserIdException {
+        try {
+
+
         UserDetails userDetails = (MdmUserDetailsImplementer) principal.getPrincipal();
         MdmUserDetails mappedUser = userDetailsService.loadUserByUsername(userDetails.getUsername());
 
         Optional<Enterprise> enterprise = enterpriseRepository.findByUserId(mappedUser.getId());
         enterprise.orElseThrow(() -> new EnterpriseNotFoundByUserIdException("Enterprise not found with user id: " + mappedUser.getId()));
         Enterprise mdmEnterprise = enterprise.get();
-
         com.google.api.services.androidmanagement.v1.model.Policy androidPolicy =
-            androidManager.createPolicy(
-                mdmEnterprise.getName(),
-                new com.google.api.services.androidmanagement.v1.model.Policy()
-                        .setApplications(policyDto.getApplications())
-            );
-        System.out.println(androidPolicy);
+            new com.google.api.services.androidmanagement.v1.model.Policy()
+                .setApplications(policyDto.getApplications());
+
+        if (!policyDto.getPasswordQuality().equals("0")) {
+            PasswordRequirements passwordRequirements = new PasswordRequirements()
+                    .setPasswordScope("SCOPE_PROFILE")
+                    .setPasswordQuality(policyDto.getPasswordQuality());
+
+            switch (policyDto.getPasswordQuality()) {
+                case "BIOMETRIC_WEAK":
+                case "SOMETHING":
+                    break;
+                case "COMPLEX":
+                    passwordRequirements
+                        .setPasswordMinimumLength(4)
+                        .setPasswordMinimumLetters(2)
+                        .setPasswordMinimumLowerCase(1)
+                        .setPasswordMinimumUpperCase(1)
+                        .setPasswordMinimumNonLetter(2)
+                        .setPasswordMinimumNumeric(1)
+                        .setPasswordMinimumSymbols(1);
+                    break;
+                default:
+                    passwordRequirements.setPasswordMinimumLength(4);
+                    break;
+            }
+
+            androidPolicy.setPasswordPolicies(List.of(passwordRequirements));
+        }
+
+        androidPolicy = androidManager.createPolicy(mdmEnterprise.getName(), androidPolicy);
         Policy mdmPolicy = new Policy();
         mdmPolicy.setDisplayName(policyDto.getDisplayName());
         mdmPolicy.setName(androidPolicy.getName());
@@ -57,9 +85,24 @@ public final class PolicyServiceImplementer implements PolicyService {
         policyResponse.setDisplayName(mdmPolicy.getDisplayName());
         policyResponse.setName(androidPolicy.getName());
         policyResponse.setApplications(androidPolicy.getApplications());
+        policyResponse.setPasswordQuality(
+            androidPolicy.getPasswordPolicies() == null ?
+            "" : androidPolicy.getPasswordPolicies().get(0).getPasswordQuality()
+        );
+        policyResponse.setPasswordScope(
+            androidPolicy.getPasswordPolicies() == null ?
+            "" : androidPolicy.getPasswordPolicies().get(0).getPasswordScope()
+        );
         policyResponse.setInitial(mdmPolicy.isInitial());
 
-        return policyResponse;
+
+            return policyResponse;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new PolicyResponse();
+        }
+
+
     }
 
     @Override
@@ -85,6 +128,14 @@ public final class PolicyServiceImplementer implements PolicyService {
         policyResponse.setName(androidPolicy.getName());
         policyResponse.setDisplayName(mdmPolicy.getDisplayName());
         policyResponse.setInitial(mdmPolicy.isInitial());
+        policyResponse.setPasswordQuality(
+            androidPolicy.getPasswordPolicies() == null ?
+            "" : androidPolicy.getPasswordPolicies().get(0).getPasswordQuality()
+        );
+        policyResponse.setPasswordScope(
+            androidPolicy.getPasswordPolicies() == null ?
+            "" : androidPolicy.getPasswordPolicies().get(0).getPasswordScope()
+        );
         policyResponse.setApplications(androidPolicy.getApplications());
 
         return policyResponse;
@@ -120,6 +171,14 @@ public final class PolicyServiceImplementer implements PolicyService {
             policyResponse.setDisplayName(mdmPolicy.getDisplayName());
             policyResponse.setInitial(mdmPolicy.isInitial());
             policyResponse.setApplications(androidPolicy.getApplications());
+            policyResponse.setPasswordQuality(
+                androidPolicy.getPasswordPolicies() == null ?
+                "" : androidPolicy.getPasswordPolicies().get(0).getPasswordQuality()
+            );
+            policyResponse.setPasswordScope(
+                    androidPolicy.getPasswordPolicies() == null ?
+                    "" : androidPolicy.getPasswordPolicies().get(0).getPasswordScope()
+            );
             policyResponses.add(policyResponse);
         }
 
