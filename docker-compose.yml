@@ -1,16 +1,6 @@
 version: "3.9"
 
 services:
-  mdmapp:
-    build: .
-    container_name: mdmapp
-    # command: ./mvnw spring-boot:run
-    volumes:
-      - .:/usr/src/swe599-final
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mdmdb
   mdmdb:
     container_name: mdmdb
     build: ./etc/docker/mariadb
